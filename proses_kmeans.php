@@ -3,23 +3,37 @@ include 'koneksi.php';
 
 function euclidean($a, $b)
 {
-    return sqrt(pow($a[0] - $b[0], 2) + pow($a[1] - $b[1], 2) + pow($a[2] - $b[2], 2));
+    $sum = 0;
+    for ($i = 0; $i < count($a); $i++) {
+        $sum += pow($a[$i] - $b[$i], 2);
+    }
+    return sqrt($sum);
 }
 
-// Ambil data
-$data = [];
+// Ambil data dari DB
 $query = mysqli_query($koneksi, "SELECT * FROM usulan_program");
+if (!$query) {
+    die("Query gagal: " . mysqli_error($koneksi));
+}
+
+$data = [];
 while ($row = mysqli_fetch_assoc($query)) {
     $data[] = [
         'id' => $row['id'],
-        'data' => [(int)$row['biaya'], (int)$row['manfaat'], (int)$row['urgensi']]
+        'data' => [
+            $row['kondisi'],
+            $row['penerima_manfaat'],
+            $row['waktu_pengerjaan'],
+            $row['biaya_pengerjaan']
+        ]
     ];
 }
 
-// Tentukan jumlah cluster (K = 3)
+// Tentukan jumlah cluster
 $k = 3;
 $centroids = array_slice(array_column($data, 'data'), 0, $k);
 
+// Iterasi K-Means
 for ($iter = 0; $iter < 10; $iter++) {
     $clusters = array_fill(0, $k, []);
 
@@ -32,23 +46,24 @@ for ($iter = 0; $iter < 10; $iter++) {
         $clusters[$minIndex][] = $d;
     }
 
+    // Update centroid
     for ($i = 0; $i < $k; $i++) {
         if (count($clusters[$i]) == 0) continue;
-        $newCentroid = [0, 0, 0];
+
+        $newCentroid = array_fill(0, 4, 0); // 4 dimensi
         foreach ($clusters[$i] as $d) {
-            $newCentroid[0] += $d['data'][0];
-            $newCentroid[1] += $d['data'][1];
-            $newCentroid[2] += $d['data'][2];
+            for ($j = 0; $j < 4; $j++) {
+                $newCentroid[$j] += $d['data'][$j];
+            }
         }
-        $centroids[$i] = [
-            $newCentroid[0] / count($clusters[$i]),
-            $newCentroid[1] / count($clusters[$i]),
-            $newCentroid[2] / count($clusters[$i])
-        ];
+        for ($j = 0; $j < 4; $j++) {
+            $newCentroid[$j] /= count($clusters[$i]);
+        }
+        $centroids[$i] = $newCentroid;
     }
 }
 
-// Update cluster ke DB
+// Simpan hasil cluster ke DB
 $labels = ['Prioritas Tinggi', 'Prioritas Menengah', 'Prioritas Rendah'];
 foreach ($clusters as $index => $cluster) {
     foreach ($cluster as $d) {

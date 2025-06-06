@@ -18,17 +18,21 @@ $query = mysqli_query($koneksi, "SELECT * FROM usulan_program ORDER BY cluster")
                 <table border="1" class="table table-bordered">
                     <tr>
                         <th>Program</th>
-                        <th>Biaya</th>
-                        <th>Manfaat</th>
-                        <th>Urgensi</th>
+                        <th>Kondisi</th>
+                        <th>Penerima Manfaat</th>
+                        <th>Waktu Pengerjaan</th>
+                        <th>Biayan Pengerjaan</th>
+                        <th>Keterangan</th>
                         <th>Cluster</th>
                     </tr>
                     <?php while ($row = mysqli_fetch_assoc($query)): ?>
                         <tr>
                             <td><?= $row['nama_program'] ?></td>
-                            <td><?= $row['biaya'] ?></td>
-                            <td><?= $row['manfaat'] ?></td>
-                            <td><?= $row['urgensi'] ?></td>
+                            <td><?= $row['kondisi'] ?></td>
+                            <td><?= $row['penerima_manfaat'] ?></td>
+                            <td><?= $row['waktu_pengerjaan'] ?></td>
+                            <td><?= $row['biaya_pengerjaan'] ?></td>
+                            <td><?= $row['keterangan'] ?></td>
                             <td><?= $row['cluster'] ?></td>
                         </tr>
                     <?php endwhile; ?>

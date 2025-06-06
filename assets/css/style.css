@@ -1,0 +1,15 @@
+@font-face {
+  font-family: "ubuntu";
+  src: url("../fonts/ubuntu/Ubuntu-Regular.ttf") format("ttf");
+  font-weight: normal;
+  font-style: normal;
+}
+
+body {
+  font-family: "ubuntu", sans-serif !important;
+}
+
+/* homepage */
+.homepage .col-lg-4 {
+  background-color: #c4c3c3;
+}
