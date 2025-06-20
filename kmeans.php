@@ -67,8 +67,10 @@
     }
 
     // Simpan cluster ke database
-    foreach ($data_cluster as $id => $cluster) {
-        $conn->query("UPDATE data_usulan SET cluster = $cluster WHERE id = $id");
+    if (isset($data_cluster)) {
+        foreach ($data_cluster as $id => $cluster) {
+            $conn->query("UPDATE data_usulan SET cluster = $cluster WHERE id = $id");
+        }
     }
 
     // Tampilkan hasil
