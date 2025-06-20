@@ -65,4 +65,26 @@ foreach ($data as $i => $_) {
 // Hitung nilai DBI
 $dbi = array_sum($R) / count($R);
 
-echo "<h3>Nilai Davies-Bouldin Index (DBI): <span style='color:blue;'>$dbi</span></h3>";
+
+?>
+
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <?php include('partials/meta.php'); ?>
+
+    <title>Hitung DBI - Aplikasi Kmeans Rifqi</title>
+</head>
+
+<body>
+    <?php include('partials/navbar.php'); ?>
+
+    <div class="container">
+        <h3 class="text-center mt-5">Nilai Davies-Bouldin Index (DBI): <br> <span style='color:blue;'><?php echo $dbi; ?></span></h3>
+    </div>
+
+    <?php include('partials/script.php'); ?>
+</body>
+
+</html>

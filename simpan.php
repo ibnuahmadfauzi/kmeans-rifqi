@@ -47,7 +47,7 @@ if (
               VALUES ('$jenis', '$nilai_kondisi', $nilai_manfaat, $nilai_waktu, $nilai_biaya)";
 
     if ($conn->query($query)) {
-        header("Location: input.php?success=1");
+        header("Location: kmeans.php?success=1");
         exit();
     } else {
         echo "Error saat menyimpan: " . $conn->error;
