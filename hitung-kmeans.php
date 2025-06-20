@@ -58,8 +58,7 @@ $query = mysqli_query($koneksi, "SELECT * FROM usulan_program ORDER BY cluster")
                                         <i class="fa-solid fa-trash"></i>
                                     </a>
                                 </td>
-                            </tr><?php while ($row = mysqli_fetch_assoc($query)): ?>
-                            <?php endwhile; ?>
+                            </tr>
                             <?php $count++; ?>
                         <?php endwhile; ?>
                     </tbody>
