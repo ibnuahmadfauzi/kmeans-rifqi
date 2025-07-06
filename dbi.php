@@ -1,71 +1,92 @@
 <?php
-$conn = new mysqli("localhost", "root", "", "kmeans_app");
+$mysqli = new mysqli("localhost", "root", "", "kmeans_app");
 
-// Ambil data (manfaat, waktu, biaya, dan cluster)
-$result = $conn->query("SELECT manfaat, waktu_pengerjaan, biaya_pengerjaan, cluster FROM data_usulan");
-
+// Ambil data usulan yang sudah diklaster
 $data = [];
-foreach ($result as $row) {
-    $cluster = $row['cluster'];
-    $point = [$row['manfaat'], $row['waktu_pengerjaan'], $row['biaya_pengerjaan']];
-    $data[$cluster][] = $point;
+$result = $mysqli->query("SELECT * FROM usulan");
+while ($row = $result->fetch_assoc()) {
+    $data[] = $row;
 }
 
-// Hitung centroid masing-masing cluster
-$centroids = [];
-foreach ($data as $cluster => $points) {
-    $n = count($points);
-    $sum = [0, 0, 0];
-    foreach ($points as $p) {
-        $sum[0] += $p[0];
-        $sum[1] += $p[1];
-        $sum[2] += $p[2];
-    }
-    $centroids[$cluster] = [$sum[0] / $n, $sum[1] / $n, $sum[2] / $n];
-}
+// Centroid akhir (dari hasil manual atau hasil iterasi sebelumnya)
+$centroids = [
+    [3, 3, 30, 70000000],
+    [3, 2, 50, 100000000],
+    [2, 3, 20, 50000000],
+    [3, 1, 18, 20000000],
+];
 
-// Fungsi jarak Euclidean
-function euclidean($a, $b)
-{
-    return sqrt(
-        pow($a[0] - $b[0], 2) +
-            pow($a[1] - $b[1], 2) +
-            pow($a[2] - $b[2], 2)
-    );
-}
+// Kelompokkan data berdasarkan cluster
+$clusters = [[], [], [], []];
+foreach ($data as $row) {
+    $fitur = [$row['kondisi'], $row['manfaat'], $row['waktu'], $row['biaya']];
+    $jarak_min = PHP_FLOAT_MAX;
+    $index = -1;
 
-// Hitung S_i: rata-rata jarak tiap titik dalam klaster ke centroid-nya
-$S = [];
-foreach ($data as $cluster => $points) {
-    $sum_dist = 0;
-    foreach ($points as $p) {
-        $sum_dist += euclidean($p, $centroids[$cluster]);
-    }
-    $S[$cluster] = $sum_dist / count($points);
-}
-
-// Hitung R_ij untuk setiap i ≠ j
-$R = [];
-foreach ($data as $i => $_) {
-    $max_Rij = -INF;
-    foreach ($data as $j => $_) {
-        if ($i == $j) continue;
-
-        $Mij = euclidean($centroids[$i], $centroids[$j]); // Jarak antar centroid
-        if ($Mij == 0) continue; // hindari pembagian nol
-        $Rij = ($S[$i] + $S[$j]) / $Mij;
-
-        if ($Rij > $max_Rij) {
-            $max_Rij = $Rij;
+    // cari centroid terdekat
+    foreach ($centroids as $i => $centroid) {
+        $d = 0;
+        for ($j = 0; $j < count($fitur); $j++) {
+            $d += pow($fitur[$j] - $centroid[$j], 2);
+        }
+        $d = sqrt($d);
+        if ($d < $jarak_min) {
+            $jarak_min = $d;
+            $index = $i;
         }
     }
-    $R[] = $max_Rij;
+
+    $clusters[$index][] = $fitur;
 }
 
-// Hitung nilai DBI
+// Hitung S_i (rata-rata jarak anggota ke centroid)
+function avg_distance_to_centroid($cluster, $centroid)
+{
+    $total = 0;
+    foreach ($cluster as $point) {
+        $d = 0;
+        for ($i = 0; $i < count($point); $i++) {
+            $d += pow($point[$i] - $centroid[$i], 2);
+        }
+        $total += sqrt($d);
+    }
+    return count($cluster) > 0 ? $total / count($cluster) : 0;
+}
+
+$S = [];
+for ($i = 0; $i < count($clusters); $i++) {
+    $S[$i] = avg_distance_to_centroid($clusters[$i], $centroids[$i]);
+}
+
+// Hitung M_ij (jarak antar centroid)
+function centroid_distance($c1, $c2)
+{
+    $d = 0;
+    for ($i = 0; $i < count($c1); $i++) {
+        $d += pow($c1[$i] - $c2[$i], 2);
+    }
+    return sqrt($d);
+}
+
+// Hitung DBI
+$R = [];
+for ($i = 0; $i < count($centroids); $i++) {
+    $maxRij = -INF;
+    for ($j = 0; $j < count($centroids); $j++) {
+        if ($i != $j) {
+            $Mij = centroid_distance($centroids[$i], $centroids[$j]);
+            if ($Mij != 0) {
+                $Rij = ($S[$i] + $S[$j]) / $Mij;
+                if ($Rij > $maxRij) {
+                    $maxRij = $Rij;
+                }
+            }
+        }
+    }
+    $R[$i] = $maxRij;
+}
+
 $dbi = array_sum($R) / count($R);
-
-
 ?>
 
 <!DOCTYPE html>
@@ -80,8 +101,32 @@ $dbi = array_sum($R) / count($R);
 <body>
     <?php include('partials/navbar.php'); ?>
 
-    <div class="container">
-        <h3 class="text-center mt-5">Nilai Davies-Bouldin Index (DBI): <br> <span style='color:blue;'><?php echo $dbi; ?></span></h3>
+    <div class="container mt-5">
+        <div class="row justify-content-center">
+            <div class="col-lg-6">
+                <div class="card">
+                    <div class="card-body">
+                        <h2>Perhitungan Davies-Bouldin Index (DBI)</h2>
+
+                        <table>
+                            <tr>
+                                <th>Cluster</th>
+                                <th>S<sub>i</sub> (Rata-rata jarak ke centroid)</th>
+                            </tr>
+                            <?php foreach ($S as $i => $val): ?>
+                                <tr>
+                                    <td>Cluster <?= $i + 1 ?></td>
+                                    <td><?= number_format($val, 6) ?></td>
+                                </tr>
+                            <?php endforeach; ?>
+                        </table>
+
+                        <h3>Hasil DBI: <span style="color:green"><?= number_format($dbi, 6) ?></span></h3>
+                        <p>Semakin kecil nilai DBI, semakin baik hasil clustering.</p>
+                    </div>
+                </div>
+            </div>
+        </div>
     </div>
 
     <?php include('partials/script.php'); ?>
