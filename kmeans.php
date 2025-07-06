@@ -54,7 +54,7 @@ foreach ($usulan as $row) {
 
     <div class="container">
         <h3 class="mt-5">Centroid Awal</h3>
-        <a href="" class="btn btn-sm btn-primary text-light mb-3">Tambah Cluster</a>
+        <a href="input.php" class="btn btn-sm btn-primary text-light mb-3">Tambah Cluster</a>
         <div class="table-responsive">
             <table class="table table-bordered">
                 <tr>
@@ -63,16 +63,11 @@ foreach ($usulan as $row) {
                     <th>Manfaat</th>
                     <th>Waktu</th>
                     <th>Biaya</th>
-                    <th>Aksi</th>
                 </tr>
                 <?php foreach ($centroids as $index => $c): ?>
                     <tr>
                         <td>Cluster<?= $index + 1 ?></td>
                         <td><?= implode("</td><td>", $c) ?></td>
-                        <td>
-                            <a href="" class="btn btn-sm btn-warning text-light">Edit</a>
-                            <a href="" class="btn btn-sm btn-danger text-light">Hapus</a>
-                        </td>
                     </tr>
                 <?php endforeach; ?>
             </table>
@@ -92,6 +87,7 @@ foreach ($usulan as $row) {
                         <th>Cluster <?= $i ?></th>
                     <?php endfor; ?>
                     <th>Cluster</th>
+                    <th>Aksi</th>
                 </tr>
                 <?php foreach ($hasilCluster as $row): ?>
                     <tr>
@@ -105,6 +101,10 @@ foreach ($usulan as $row) {
                             <td><?= number_format($d, 6) ?></td>
                         <?php endforeach; ?>
                         <td>Cluster-<?= $row['cluster'] ?></td>
+                        <td>
+                            <a href="edit.php?id=<?php echo $row['id']; ?>" class="btn btn-sm btn-warning text-light">Edit</a>
+                            <a href="hapus.php?id=<?php echo $row['id']; ?>" class="btn btn-sm btn-danger text-light">Hapus</a>
+                        </td>
                     </tr>
                 <?php endforeach; ?>
             </table>

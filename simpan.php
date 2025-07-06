@@ -43,8 +43,8 @@ if (
     else $nilai_biaya = 4;
 
     // Simpan ke database
-    $query = "INSERT INTO data_usulan (jenis_usulan, kondisi_penerima, manfaat, waktu_pengerjaan, biaya_pengerjaan)
-              VALUES ('$jenis', '$nilai_kondisi', $nilai_manfaat, $nilai_waktu, $nilai_biaya)";
+    $query = "INSERT INTO usulan (jenis_usulan, kondisi, manfaat, waktu, biaya)
+              VALUES ('$jenis', '$nilai_kondisi', $nilai_manfaat, $waktu_hari, $biaya_rupiah)";
 
     if ($conn->query($query)) {
         header("Location: kmeans.php?success=1");

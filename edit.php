@@ -1,7 +1,7 @@
 <?php
 $conn = new mysqli("localhost", "root", "", "kmeans_app");
 $id = $_GET['id'];
-$result = $conn->query("SELECT * FROM data_usulan WHERE id = $id");
+$result = $conn->query("SELECT * FROM usulan WHERE id = $id");
 $data = $result->fetch_assoc();
 ?>
 <!DOCTYPE html>
@@ -27,12 +27,12 @@ $data = $result->fetch_assoc();
                     </div>
 
                     <div class="mb-3">
-                        <label class="form-label" for="kondisi_penerima">Kondisi Penerima:</label>
-                        <select name="kondisi_penerima" class="form-select" id="kondisi_penerima" required>
-                            <option value="1" <?= $data['kondisi_penerima'] == 1 ? 'selected' : '' ?>>Rusak ringan</option>
-                            <option value="2" <?= $data['kondisi_penerima'] == 2 ? 'selected' : '' ?>>Rusak sedang</option>
-                            <option value="3" <?= $data['kondisi_penerima'] == 3 ? 'selected' : '' ?>>Rusak parah</option>
-                            <option value="4" <?= $data['kondisi_penerima'] == 4 ? 'selected' : '' ?>>Belum ada</option>
+                        <label class="form-label" for="kondisi">Kondisi Penerima:</label>
+                        <select name="kondisi" class="form-select" id="kondisi" required>
+                            <option value="1" <?= $data['kondisi'] == 1 ? 'selected' : '' ?>>Rusak ringan</option>
+                            <option value="2" <?= $data['kondisi'] == 2 ? 'selected' : '' ?>>Rusak sedang</option>
+                            <option value="3" <?= $data['kondisi'] == 3 ? 'selected' : '' ?>>Rusak parah</option>
+                            <option value="4" <?= $data['kondisi'] == 4 ? 'selected' : '' ?>>Belum ada</option>
                         </select>
                     </div>
 
@@ -43,12 +43,12 @@ $data = $result->fetch_assoc();
 
                     <div class="mb-3">
                         <label class="form-label" for="waktu">Waktu Pengerjaan (kategori 1-3):</label>
-                        <input type="number" name="waktu" class="form-control" id="waktu" value="<?= $data['waktu_pengerjaan'] ?>" required>
+                        <input type="number" name="waktu" class="form-control" id="waktu" value="<?= $data['waktu'] ?>" required>
                     </div>
 
                     <div class="mb-3">
                         <label class="form-label" for="biaya">Biaya Pengerjaan (kategori 1-4):</label>
-                        <input type="number" name="biaya" id="biaya" class="form-control" value="<?= $data['biaya_pengerjaan'] ?>" required><br>
+                        <input type="number" name="biaya" id="biaya" class="form-control" value="<?= $data['biaya'] ?>" required><br>
                     </div>
 
                     <div class="mb-3">

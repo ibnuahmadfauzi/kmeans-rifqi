@@ -8,11 +8,11 @@ if ($conn->connect_error) {
 }
 
 // Periksa apakah ada ID yang dikirim dari form
-if (isset($_POST['id'])) {
-    $id = intval($_POST['id']); // pastikan ID adalah angka bulat
+if (isset($_GET['id'])) {
+    $id = intval($_GET['id']); // pastikan ID adalah angka bulat
 
     // Eksekusi query hapus
-    $query = "DELETE FROM data_usulan WHERE id = $id";
+    $query = "DELETE FROM usulan WHERE id = $id";
 
     if ($conn->query($query) === TRUE) {
         // Berhasil dihapus, arahkan kembali ke halaman sebelumnya
